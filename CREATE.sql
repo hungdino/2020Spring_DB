@@ -4,7 +4,7 @@ create table champ(
     primary key (champion_id)
 );
 
-load data local infile './champs.csv'
+load data local infile './champ.csv'
 into table champ
 fields terminated by ','
 enclosed by '"'
