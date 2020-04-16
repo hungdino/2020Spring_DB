@@ -52,7 +52,7 @@ CREATE TABLE teamban(
     PRIMARY KEY (match_id,banturn),
  );
 
-load data local infile 'teambans.csv'
+load data local infile './teambans.csv'
 into table teamban
 fields terminated by ','
 enclosed by '"'
@@ -82,7 +82,7 @@ CREATE TABLE stat(
     PRIMARY KEY (player_id)
  );
 
-load data local infile 'stats.csv'
+load data local infile './stats.csv'
 into table stat
 fields terminated by ','
 enclosed by '"'
