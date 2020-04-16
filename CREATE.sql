@@ -49,7 +49,7 @@ CREATE TABLE teamban(
     team char(1)  NOT NULL,
     champion_id int default 0 NOT NULL,
     banturn tinyint default 0 NOT NULL,
-    PRIMARY KEY (match_id,banturn),
+    PRIMARY KEY (match_id,banturn)
  );
 
 load data local infile './teambans.csv'
