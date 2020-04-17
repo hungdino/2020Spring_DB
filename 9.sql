@@ -1,0 +1,1 @@
+SELECT version, win_cnt, lose_cnt, win_ratio
