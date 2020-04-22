@@ -20,4 +20,6 @@ FROM
 	ON (A.pos = B.pos AND A.kda < B.kda)
 	WHERE B.kda is NULL
 	) AS RESULT JOIN champ ON (RESULT.c_i = champ.champion_id)
-ORDER BY position ASC
+ORDER BY position ASC;
+
+

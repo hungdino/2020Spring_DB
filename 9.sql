@@ -23,4 +23,4 @@ NATURAL JOIN champ
 ON (A.m_i = B.m_i AND A.w = B.w AND B.c_n IN ("Lee Sin","Teemo"))
 WHERE A.c_n = "Lee Sin" AND B.c_n = "Teemo"
 GROUP BY version
-ORDER BY version
+ORDER BY version;

@@ -17,4 +17,6 @@ FROM(
 GROUP BY pos, champion_name) AS B
 	ON A.pos = B.pos AND A.cnt < B.cnt
 	WHERE B.cnt is NULL AND A.pos NOT IN ("NONE", "SOLO", "DUO")
-	ORDER BY position
+	ORDER BY position;
+
+	

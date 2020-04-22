@@ -1,1 +1,2 @@
-SELECT champion_name FROM champ, count(*) as cnt;
+SELECT COUNT(*) cnt FROM(
+SELECT DISTINCT champion_name FROM champ) AS C;

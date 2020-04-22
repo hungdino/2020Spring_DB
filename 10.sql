@@ -33,4 +33,4 @@ WHERE B.c_n is NOT NULL
 GROUP BY A.c_n) AS Result
 WHERE battle_record > 100
 ORDER BY win_ratio DESC
-LIMIT 5
+LIMIT 5;

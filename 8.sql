@@ -7,4 +7,4 @@ FROM teamban
 NATURAL JOIN match_info
 WHERE SUBSTRING_INDEX(version, ".", 2) = "7.7"
 )
-ORDER BY champion_name
+ORDER BY champion_name;

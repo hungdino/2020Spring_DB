@@ -28,17 +28,6 @@ GROUP BY ss1, ss2) AS SS_Table
 WHERE used_ratio > 0.01
 ORDER BY used_ratio DESC;
 
-
-SELECT *
-FROM participant P JOIN stat S ON (P.player_id = S.player_id AND P.position = "TOP") AS A
-LEFT JOIN (
-SELECT *
-FROM participant P
-JOIN stat S ON (P.player_id = S.player_id AND P.position = "TOP")
-) AS B ON (A.match_id = B.match_id AND A.ss1 in ("Flash", "Teleport") AND A.ss2 in ("Flash", "Teleport") AND
-		B.ss1 in ("Flash", "Ignite") AND B.ss2 in ("Flash", "Ignite"));
- 
-
 SELECT TP_win_cnt, IG_win_cnt, TP_win_cnt/(TP_win_cnt+IG_win_cnt) TP_vs_IG_win_ratio FROM(
 SELECT SUM(tp_win) TP_win_cnt, SUM(ig_win) IG_win_cnt FROM(
 SELECT 
