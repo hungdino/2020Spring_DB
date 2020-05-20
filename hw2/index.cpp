@@ -3,7 +3,7 @@ using namespace std;
 #include "index.h"
 
 
-Node *init(){//初始化一個 node
+Node *init(Node *np){//初始化一個 node
     int i;
     np = new Node;
     np -> data = new int [M-1];
@@ -23,26 +23,32 @@ Index::Index(int& num_rows,vector<int>& key,vector<int>& value){
     for ( i = 0; i < num_rows; i++)
     {
         cout << "insert: " << key[i] << ", " << value[i] << endl;
-        insert(this,this->root, key[i], value[i]);
+        this->root = insert(this,this->root, this->np, this->x, key[i], value[i]);
     }
-    
 }
 Index::~Index(){
 
 }
-void Index::insert(Index *T,Node *root, int key, int value){
+Node *Index::insert(Index *T,Node *root, Node *np, Node *x, int key, int value){
+    cout << "insert" << endl;
     int i, temp;
     x = root;//從 root 開始
     if (x == NULL){//若 root 是空的
-        root = init();//初始化一個 node 作為 root
+        //cout << "start with root" << endl;
+        //cout << "init root" <<endl;
+        root = init(this->np);//初始化一個 node 作為 root
+        //cout << root << endl;
         x = root;//x 儲存 root 的指標
     }
     else{//已有 root
+        //cout << "root existed" << endl;
         if (x->leaf ==true && x->n == M-1)//root 是子葉，且容納元素已滿
         {
-            temp = split_child(this, this->root, x, -1);//執行 split
+            cout << "capacity full, go to split, *x= " << x << endl;
+            temp = split_child(this, this->root,this->np, x, -1);//執行 split
+            cout << "split completed" << endl;
             x = root;
-            for (i = 0; i < (x->n); i++){//
+            for (i = 0; i < (x->n); i++){
                 if ((key > x->data[i]) && (key < x->data[i + 1])){//
                     i++;
                     break;
@@ -57,6 +63,7 @@ void Index::insert(Index *T,Node *root, int key, int value){
             x = x->child_ptr[i];// x 換成子樹中位數的指標
         }
         else{//root 不是子葉，
+            cout << "just insert in it" << endl;
             while(x->leaf == false){//x 非子葉的情況
                 for (i = 0; i < (x->n) ; i++ )
                 {
@@ -72,7 +79,7 @@ void Index::insert(Index *T,Node *root, int key, int value){
                     }
                 }
                 if ( (x->child_ptr[i])->n == M-1 ){
-                    temp = split_child(this,this->root, x, i);
+                    temp = split_child(this, this->root,this->np, x, i);
                     x -> data[x->n] = temp;
                     x -> n++;
                     continue;
@@ -83,24 +90,29 @@ void Index::insert(Index *T,Node *root, int key, int value){
             }
         }
     }
+    cout << x << endl;
     x -> data[x->n] = key;
+    cout << "spspsp" << endl;
     x -> value[x->n] = value;
     sort(x->data, x->n);
     x->n++;
+    cout << "insert done" << endl;
+    return root;
 
 }
-int Index::split_child(Index *T,Node* root, Node *x, int i){
+int Index::split_child(Index *T,Node *root, Node *np, Node *x, int i){
     int  j, mid;//iter 和 中位值
     Node *np1, *npMiddle, *y;
-    npMiddle = init();//初始化一個 node
+    npMiddle = init(this->np);//初始化一個 node
     npMiddle->leaf = true;
-    if( i == -1 ){//
+    if( i == -1 ){
+        cout << x << endl;
         mid = x->data[Middle-1];//mid 紀錄最右邊的值
         x->data[Middle-1] = 0;//將最右邊歸零
         x->n--;//將儲存值減一
-        np1 = init();//初始化新結點
+        np1 = init(this->np);//初始化新結點
         np1->leaf = true;
-        for (j = Middle; j < M-1 ; j++)//將舊的資料搬到新結點
+        for (j = Middle; j < M-1 ; j++)//將右半邊舊的資料搬到新結點
         {
             npMiddle->data[j - Middle] = x->data[j];//搬資料
             npMiddle->child_ptr[j - Middle] = x->child_ptr[j];//重新指子樹指標
@@ -108,7 +120,7 @@ int Index::split_child(Index *T,Node* root, Node *x, int i){
             x->data[j] = 0;
             x->n--;
         }
-        for ( j = 0; i < M; j++)
+        for ( j = 0; j < M; j++)
         {
             x->child_ptr[j] = NULL;
         }
@@ -116,7 +128,7 @@ int Index::split_child(Index *T,Node* root, Node *x, int i){
         np1->child_ptr[np1->n] = x;
         np1->child_ptr[np1->n + 1] = npMiddle;
         np1->n++;
-        root = np1; 
+        root = np1;
     }
     else
     {
@@ -151,9 +163,27 @@ void Index::sort(int *p, int n){
         }
     }
 }
-
+void Index::traverse(Node *p){
+    int i;
+    for ( i = 0; i < p->n; i++)
+    {
+        if(p->leaf == false)
+        {
+            traverse(p->child_ptr[i]);
+        }
+        cout << "key: " << p->data[i] << "with value: " << p->value[i] << endl;
+    }
+    if (p->leaf == false)
+    {
+        traverse(p->child_ptr[i]);
+    }
+}
+void Index::bridge(){
+    cout << "test message" << endl; 
+    cout << this->root <<endl;
+}
 void Index::key_query(vector<int>& query_keys){
-
+    
 }
 void Index::range_query(vector<pair<int, int>>& query_pairs){
     

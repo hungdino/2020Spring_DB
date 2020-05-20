@@ -17,23 +17,24 @@ struct Node
     Node **child_ptr;//指向子樹
     bool leaf;//是否為子葉
     int n;//已儲存之元素個數
-}*np = NULL, *x = NULL;
+};
     Node *init();
 
 class Index{
 private:
-    Node *root = NULL;
+    Node *root = NULL, *np = NULL, *x = NULL;
 public:
     Index(int& num_rows,vector<int>& key,vector<int>& value);
     ~Index();
-    void insert(Index *T,Node *root, int key, int value);
-    int split_child(Index *T,Node *root, Node *x, int i);
+    Node* insert(Index *T,Node *root, Node *np, Node *x, int key, int value);
+    int split_child(Index *T,Node *root, Node *np, Node *x, int i);
     void sort(int *p, int n);
-
 
     void key_query(vector<int>& query_keys);
     void range_query(vector<pair<int, int>>& query_pairs);
     void clear_index();
+    void traverse(Node *p);
+    void bridge();
 
 
 };
