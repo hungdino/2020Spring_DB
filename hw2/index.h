@@ -5,7 +5,7 @@
 #include <vector>
 #include <math.h>
 using namespace std;
-#define MAX_DEGREE 3
+#define MAX_DEGREE 6
 //一個節點最多有 MAX_DEGREE - 1
 
 
@@ -20,6 +20,10 @@ private:
 
     };
 public:
+    int *d;
+    Index **child_ptr;
+    bool l;
+    int n;
     Index(int& num_rows,vector<int>& key,vector<int>& value);
     ~Index();
     void key_query(vector<int>& query_keys);

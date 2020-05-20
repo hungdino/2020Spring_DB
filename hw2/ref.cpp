@@ -2,16 +2,15 @@
 #include <index.h>
 using namespace std;
 
-class Index {
-public:
-   int *d;
-   Index **child_ptr;
-   bool l;
-   int n;
-}*r = NULL, *np = NULL, *x = NULL;
+Index *r = NULL, *np = NULL, *x = NULL;
 
 Index(int& num_rows,vector<int>& key,vector<int>& value)
 {
+    for (int i = 0; i < num_rows; i++)
+    {
+        insert(key[i], value[i]);
+    }
+    
 
 }
 ~Index()
@@ -28,7 +27,7 @@ void range_query(vector<pair<int, int>>& query_pairs)
 }
 void clear_index()
 {
-    
+
 }
 
 
@@ -39,7 +38,8 @@ void clear_index()
 Index* init(){//初始化節點
    int i;
    np = new Index;
-   np->d = new int[6];//order 6
+   np->d = new int[MAX_DEGREE];//order 6
+   np->v = new int[MAX_DEGREE];
    np->child_ptr = new Index *[7];
    np->l = true;
    np->n = 0;
@@ -48,7 +48,7 @@ Index* init(){//初始化節點
    }
    return np;
 }
-/*
+
 void traverse(Index *p){//traverse tree 
    cout<<endl;
    int i;
@@ -63,7 +63,7 @@ void traverse(Index *p){//traverse tree
    }
    cout<<endl;
 }
-*/
+
 void sort(int *p, int n){//sort the tree 
    int i, j, t;
    for (i = 0; i < n; i++) {
@@ -121,7 +121,7 @@ int split_child(Index *x, int i) {
    return mid;
 }
 
-void insert(int a) {
+void insert(int a, int val) {
    int i, t;
    x = r;
    if (x == NULL) {
@@ -166,6 +166,7 @@ void insert(int a) {
    }
 }
    x->d[x->n] = a;
+   x->v[x->n] = val;
    sort(x->d, x->n);
    x->n++;
 }
@@ -180,6 +181,7 @@ int main() {
       cin>>t;
       insert(t);
    }
-   cout<<"traversal of constructed B tree\n";
+    cout<<"traversal of constructed B tree\n";
    traverse(r);
+
 }
