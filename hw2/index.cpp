@@ -1,22 +1,21 @@
-#include <iostream>
-#include <index.h>
-using namespace std;
+#include "index.h"
 
-Index *r = NULL, *np = NULL, *x = NULL;
+struct BplusTree {
+    int *d;
+    int *v;
+    BplusTree **child_ptr;
+    bool l;
+    int n;
+}*r = NULL, *np = NULL, *x = NULL;
 
-Index(int& num_rows,vector<int>& key,vector<int>& value)
-{
-    for (int i = 0; i < num_rows; i++)
-    {
-        insert(key[i], value[i]);
-    }
-    
 
-}
-~Index()
-{
+BplusTree* init();//to create nodes
+void traverse(BplusTree *p);//traverse tree
+void sort(int *p, int n);//sort the tree
+int split_child(BplusTree *x, int i);
 
-}
+
+/*
 void key_query(vector<int>& query_keys)
 {
 
@@ -29,18 +28,13 @@ void clear_index()
 {
 
 }
-
-
-
-
-
-
-Index* init(){//初始化節點
+*/
+BplusTree* init(){//to create nodes
    int i;
-   np = new Index;
+   np = new BplusTree;
    np->d = new int[MAX_DEGREE];//order 6
    np->v = new int[MAX_DEGREE];
-   np->child_ptr = new Index *[7];
+   np->child_ptr = new BplusTree *[7];
    np->l = true;
    np->n = 0;
    for (i = 0; i < 7; i++) {
@@ -49,7 +43,7 @@ Index* init(){//初始化節點
    return np;
 }
 
-void traverse(Index *p){//traverse tree 
+void traverse(BplusTree *p){//traverse tree
    cout<<endl;
    int i;
    for (i = 0; i < p->n; i++) {
@@ -64,7 +58,7 @@ void traverse(Index *p){//traverse tree
    cout<<endl;
 }
 
-void sort(int *p, int n){//sort the tree 
+void sort(int *p, int n){//sort the tree
    int i, j, t;
    for (i = 0; i < n; i++) {
       for (j = i; j <= n; j++) {
@@ -77,9 +71,9 @@ void sort(int *p, int n){//sort the tree
    }
 }
 
-int split_child(Index *x, int i) {
+int split_child(BplusTree *x, int i) {
    int j, mid;
-   Index *np1, *np3, *y;
+   BplusTree *np1, *np3, *y;
    np3 = init();
    np3->l = true;
    if (i == -1) {
@@ -169,19 +163,4 @@ void insert(int a, int val) {
    x->v[x->n] = val;
    sort(x->d, x->n);
    x->n++;
-}
-
-
-int main() {
-   int i, n, t;
-   cout<<"enter the no of elements to be inserted\n";
-   cin>>n;
-   for(i = 0; i < n; i++) {
-      cout<<"enter the element\n";
-      cin>>t;
-      insert(t);
-   }
-    cout<<"traversal of constructed B tree\n";
-   traverse(r);
-
 }

@@ -8,30 +8,24 @@ using namespace std;
 #define MAX_DEGREE 6
 //一個節點最多有 MAX_DEGREE - 1
 
+void insert(int a, int val);
 
 class Index
 {
-private:
-    struct Node
-    {
-        bool isLeaf;
-        vector<pair<int,int>> key_value;
-        vector
-
-    };
 public:
-    int *d;
-    Index **child_ptr;
-    bool l;
-    int n;
-    Index(int& num_rows,vector<int>& key,vector<int>& value);
-    ~Index();
+
+    Index(int& num_rows,vector<int>& key,vector<int>& value)
+    {
+        for (int i = 0; i < num_rows; i++)
+        {
+            insert(key[i], value[i]);
+        } 
+    }
+    ~Index(){}
     void key_query(vector<int>& query_keys);
     void range_query(vector<pair<int, int>>& query_pairs);
     void clear_index();
-
-
-
 };
+
 
 #endif
