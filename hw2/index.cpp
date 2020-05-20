@@ -30,7 +30,7 @@ Index::~Index(){
 
 }
 Node *Index::insert(Index *T,Node *root, Node *np, Node *x, int key, int value){
-    cout << "insert" << endl;
+    //cout << "insert" << endl;
     int i, temp;
     x = root;//從 root 開始
     if (x == NULL){//若 root 是空的
@@ -44,23 +44,26 @@ Node *Index::insert(Index *T,Node *root, Node *np, Node *x, int key, int value){
         //cout << "root existed" << endl;
         if (x->leaf ==true && x->n == M-1)//root 是子葉，且容納元素已滿
         {
-            cout << "capacity full, go to split, *x= " << x << endl;
+            //cout << "capacity full, go to split, *x= " << x << endl;
             temp = split_child(this, this->root,this->np, x, -1);//執行 split
-            cout << "split completed" << endl;
+            //cout << "split completed" << endl;
             x = root;
             for (i = 0; i < (x->n); i++){
                 if ((key > x->data[i]) && (key < x->data[i + 1])){//
                     i++;
                     break;
                 }
-                else if ( key < x->data[0]){
+                else if ( key < x->data[0] ){
                     break;
                 }
                 else{
                     continue;
                 }
             }
-            x = x->child_ptr[i];// x 換成子樹中位數的指標
+            //問題在這 !!!
+            cout << x->n  << endl;
+            x = x->child_ptr[i];// x 換成子樹相對應的位置， i < key < i+1
+            //cout << x << endl;
         }
         else{//root 不是子葉，
             cout << "just insert in it" << endl;
@@ -90,13 +93,13 @@ Node *Index::insert(Index *T,Node *root, Node *np, Node *x, int key, int value){
             }
         }
     }
-    cout << x << endl;
+    //cout << x << endl;
     x -> data[x->n] = key;
-    cout << "spspsp" << endl;
+    //cout << "spspsp" << endl;
     x -> value[x->n] = value;
     sort(x->data, x->n);
     x->n++;
-    cout << "insert done" << endl;
+    //cout << "insert done" << endl;
     return root;
 
 }
@@ -106,7 +109,7 @@ int Index::split_child(Index *T,Node *root, Node *np, Node *x, int i){
     npMiddle = init(this->np);//初始化一個 node
     npMiddle->leaf = true;
     if( i == -1 ){
-        cout << x << endl;
+        //cout << x << endl;
         mid = x->data[Middle-1];//mid 紀錄最右邊的值
         x->data[Middle-1] = 0;//將最右邊歸零
         x->n--;//將儲存值減一
@@ -117,7 +120,7 @@ int Index::split_child(Index *T,Node *root, Node *np, Node *x, int i){
             npMiddle->data[j - Middle] = x->data[j];//搬資料
             npMiddle->child_ptr[j - Middle] = x->child_ptr[j];//重新指子樹指標
             npMiddle->n++;//因應新資料，增加已儲存個數
-            x->data[j] = 0;
+            x->data[j] = 0;6     
             x->n--;
         }
         for ( j = 0; j < M; j++)
@@ -179,8 +182,8 @@ void Index::traverse(Node *p){
     }
 }
 void Index::bridge(){
-    cout << "test message" << endl; 
-    cout << this->root <<endl;
+    //cout << "test message" << endl; 
+    //cout << this->root <<endl;
 }
 void Index::key_query(vector<int>& query_keys){
     
