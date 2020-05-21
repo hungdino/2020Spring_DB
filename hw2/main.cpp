@@ -27,7 +27,7 @@ int main()
     //Uncomment to test your index
     chrono::steady_clock::time_point start = chrono::steady_clock::now();
     //Build index when index constructor is called
-    Index myIndex(num_rows, key, value);
+    //Index myIndex(num_rows, key, value);
     chrono::steady_clock::time_point built_index = chrono::steady_clock::now();
     cout<<"traversal of constructed B tree\n";
     //Query by key

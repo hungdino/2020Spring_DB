@@ -1,15 +1,23 @@
 #include<iostream>
 using namespace std;
+
+
+
+
+
+
+
 struct BplusTree {
    int *d;
    BplusTree **child_ptr;
    bool l;
    int n;
 }*r = NULL, *np = NULL, *x = NULL;
+
 BplusTree* init()//to create nodes {
    int i;
    np = new BplusTree;
-   np->d = new int[6];//order 6
+   np->d = new int[6];//order 7
    np->child_ptr = new BplusTree *[7];
    np->l = true;
    np->n = 0;
@@ -46,6 +54,21 @@ void sort(int *p, int n)//sort the tree {
       }
    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int split_child(BplusTree *x, int i) {
    int j, mid;
@@ -97,7 +120,8 @@ void insert(int a) {
    if (x == NULL) {
       r = init();
       x = r;
-   } else {
+   } 
+   else {
       if (x->l== true && x->n == 6) {
          t = split_child(x, -1);
          x = r;
