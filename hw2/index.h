@@ -4,38 +4,37 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-#define MAX_DEGREE 6
+#define ORDER 6
 //一個節點最多有 MAX_DEGREE - 1
 
 struct Node
 {
-    int *key;
-    int *value;
-    Node **child_ptr;
+    Node *parent;
+    Node *right;
+    Node *left;
+    vector<node *> ptr_v;
+    vector< pair<int,int> > key_value_pair;
     bool isLeaf;
-    int n;
 };
 
 
 class Index
 {
 private:
-    Node **pp_root = new Node *;
-    Node **pp_np = new Node *;
-    Node **pp_x = new Node *;
+    int height = 1;
+    Node * root = NULL;
 public:
-    Node* init();
-    void insert(int k, int val);
-    int split_child(Node *x, int i);
-    void key_query(vector<int>& query_keys);
+    void insert(int &k, int &val);
+    void split_child(Node *ptr);
+
+    void key_query(vector<int>& keys);
     void range_query(vector< pair<int,int> >& query_pairs);
     void clear_index();
     void sort(int *p, int n);
-    void traverse(Node *p);
     
     Index(int num, vector<int> &key, vector<int> &value);
     ~Index();
-    
+    void release(Node *ptr);
     void debug();
 };
 #endif

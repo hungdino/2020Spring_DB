@@ -3,207 +3,163 @@
 #include <math.h>
 #include "index.h"
 
-Node* Index::init()
-{
-    int i;
-    *pp_np = new Node;
-    /*
-    cout << "pp_np is    " << setw(20) << pp_np << endl;
-    cout << "*pp_np is   " << setw(20) << *pp_np << endl;
-    */
-    (*pp_np) -> key = new int[MAX_DEGREE - 1];
-    (*pp_np) -> value = new int [MAX_DEGREE - 1];
-    (*pp_np) -> child_ptr = new Node* [MAX_DEGREE];
-    (*pp_np) -> isLeaf = true;  
-    (*pp_np) -> n = 0;
-    for (int i = 0; i < MAX_DEGREE; i++)
-    {
-        (*pp_np) -> child_ptr[i] = NULL;
-    }
-    /*
-    cout << "(*pp_np) -> key is    " << setw(20) << (*pp_np) -> key << endl;
-    cout << "(*pp_np) -> value is  " << setw(20) << (*pp_np) -> value << endl;
-    */
-    return *pp_np;
-}
 
 Index::Index(int num, vector<int> &key, vector<int> &value)
 {
-    
     for (int i = 0; i < num; i++)
     {
         insert(key[i], value[i]);
     }
 }
-void Index::insert(int k, int val)
+void Index::insert(int & k, int & val)
 {
     cout << "insert key: " << setw(3) << k << endl;
     cout << "with value: " << setw(3) << val << endl;
-    /*
-    cout << "pp_root is  " << setw(20) << pp_root << endl;
-    cout << "*pp_root is " << setw(20) << *pp_root << endl;
-    cout << "pp_np is    " << setw(20) << pp_np << endl;
-    cout << "*pp_np is   " << setw(20) << *pp_np << endl;
-    cout << "pp_x is     " << setw(20) << pp_x << endl;
-    cout << "*pp_x is    " << setw(20) << *pp_x << endl;
-    */
-    int i, temp;// 用於 iter
-    *pp_x = *pp_root;
-    cout << "pp_x is     " << setw(20) << pp_x << endl;
-    cout << "*pp_x is    " << setw(20) << *pp_x << endl;
-    if (*pp_x == NULL)//整個 B+ Tree 還是空的
+    if (root == NULL)//整個 B+ Tree 還是空的
     {
-        *pp_root = init();//創建 root node
-        *pp_x = *pp_root;
+        root = new(Node);
+        root -> isLeaf = 1;
+        root -> right = NULL;
+        root -> left = NULL;
+        root -> key_value_pair.push_back({k, val});
     }
-    else//Root 已經有東西了
+    Node *ptr = root;
+    int i = 0;
+    while (true)
     {
-        //cout << (*pp_x) -> n <<endl;
-        if ( (*pp_x) -> isLeaf == true && (*pp_x) -> n == MAX_DEGREE - 1 )//Node 是滿的
+        for ( i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++);
+        if(ptr->isLeaf == true)
         {
-            temp = split_child( (*pp_x), -1);
-            *pp_x = *pp_root;
-            for (i = 0; i < ( (*pp_x) -> n ); i++)
+            if(ptr->key_value_pair[i-1].first == k){
+                cout << "The inserted key is used." << endl;
+                return;
+            }
+            else
             {
-                if ( (k > (*pp_x) -> key[i]) && (k < (*pp_x) -> key[i+1]) ){
-                    i++;
-                    break;
-                }else if( k < (*pp_x) -> key[0]){
-                    break;
+                if (i == ptr -> key_value_pair.size()){
+                    ptr -> key_value_pair.push_back({key, value});
                 }else{
-                    continue;
+                    ptr -> key_value_pair.insert(ptr->key_value_pair.begin() + i, {key, value});
                 }
+                if (ptr -> key_value_pair.size() > 2*ORDER)
+                {
+                    split_child(ptr);
+                }
+                return;
+                
             }
-            *pp_x = (*pp_x) -> child_ptr[i];
-        }
-        else// Node 還有空間或是不是子葉
+        }else if (ptr->isLeaf == false)
         {
-            while( (*pp_x) -> isLeaf == false)
+            ptr = ptr -> ptr_v[i];
+        }
+    }
+}
+
+int Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上方節點，下面接 x 和 npMiddle
+{
+    cout << "split from node " << ptr << endl;
+    Node * node_left = new(Node);
+    Node * node_right = new(Node);
+
+    node_left -> isLeaf = ptr -> isLeaf;
+    node_right -> isLeaf = ptr -> isLeaf;
+
+    node_left -> right = node_right;
+    node_right -> right = ptr -> right;
+    node_left -> left = ptr -> left;
+    node_right -> left = node_left;
+    if (ptr -> right != NULL){
+        ptr -> right -> left = node_right;
+    }
+    if (ptr -> left != NULL)
+    {
+        ptr -> left -> right = node_left;
+    }
+    if (ptr == root)
+    {
+        height ++;
+        root = new(Node);
+        node_right -> parent = node_left -> parent = root;
+        root -> parent = NULL;
+        root -> left = root -> right = NULL;
+        root -> isLeaf = false;
+        root -> key_value_pair.push_back(ptr->key_value_pair[ORDER]);
+        if (ptr -> isLeaf == true)
+        {
+            node_right -> key_value_pair.push_back(ptr->key_value_pair[ORDER]);
+        }
+        for (int i = 0; i < ORDER; i++)
+        {
+            node_left -> key_value_pair.push_back(ptr->key_value_pair[i]);
+            node_right -> key_value_pair.push_back(ptr->key_value_pair[ORDER+1+i]);
+        }
+        if(ptr->isLeaf == false){
+            for (int i = 0; i < ORDER+1; i++)
             {
-                for (i = 0; i < ( (*pp_x) -> n ); i++)
-                {
-                    if ( (k > (*pp_x) ->key[i]) && (k < (*pp_x) -> key[i+1] ) ){
-                        i++;
-                        break;
-                    }else if ( k < (*pp_x) -> key[0] ){
-                        break;
-                    }else{
-                        continue;
-                    }
-                }
-                if ( ( (*pp_x) -> child_ptr[i] ) -> n == MAX_DEGREE - 1 )
-                {
-                    temp = split_child(*pp_x, i);
-                    (*pp_x) -> key[(*pp_x)->n] = temp;
-                }
-                else{
-                    *pp_x = (*pp_x)->child_ptr[i];
-                }
+                node_left -> ptr_v.push_back(ptr->ptr_v[i]);
+                node_right -> ptr_v.push_back(ptr->ptr_v[ORDER+1+i]);
+            }
+            for (int i = 0; i < node_left->ptr_v.size(); i++)
+            {//連接左右節點和對應子節點
+                node_left -> ptr_v[i] -> parent = node_left;
+                node_right -> ptr_v[i] -> parent = node_right;
             }
         }
+        root -> ptr_v.push_back(node_left);
+        root -> ptr_v.push_back(node_right);
+        node_left -> parent = node_right -> parent = root;
+        delete(ptr);
+    }else{
+        pair<int,int> mid = ptr -> key_value_pair[ORDER];
+        Node *p = ptr -> parent;
+        node_left -> parent = node_right -> parent = ptr -> parent;
+        int i;
+        if (ptr -> isLeaf == true)
+        {
+            node_right -> key_value_pair.push_back( ptr -> key_value_pair[i]);
+        }
+        for ( i = 0; i < ORDER; i++)
+        {
+            node_left->key_value_pair.push_back(ptr->key_value_pair[i]);
+            node_right->key_value_pair.push_back(ptr->key_value_pair[ORDER+1+i]);
+        }
+        if ( ptr->isLeaf == false){
+            for ( i = 0; i < ORDER+1; i++)
+            {
+                node_left -> ptr_v.push_back(ptr -> ptr_v[i]);
+                node_right -> ptr_v.push_back(ptr -> ptr_v[ORDER+1+i]);
+            }
+            for ( i = 0; i < ORDER_1; i++)
+            {
+                node_left -> ptr_v[i] -> parent = node_left;
+                node_right -> ptr_v[i] -> parent = node_right;
+            }
+        }
+        for ( i = 0; i < p -> key_value_pair.size() && mid.first >= p -> key_value_pair[i].first; i++);
+        if (i==p->key_value_pair.size())
+        {
+            p->key_value_pair.push_back(mid);
+            p->ptr_v.pop_back();
+            p->ptr_v.push_back(node_left);
+            p->ptr_v.push_back(node_right);
+        }else if( i == 0 ){
+            p->key_value_pair.insert(p->key_value_pair.begin(), mid);
+            p->ptr_v[0] = node_left;
+            p->ptr_v.insert(p->ptr_v.begin()+1, node_right);
+        }else{
+            p->key_value_pair.insert(p->key_value_pair.begin()+i, mid);
+            p->ptr_v[i] = node_left;
+            p->ptr_v.insert(p->ptr_v.begin()+i+1, node_right);
+        }
+        delete(pt);
+        if (p->key_value_pair.size() > 2*ORDER)
+        {
+            split_child(p);
+        }
     }
-    (*pp_x) -> key[(*pp_x)->n] = k;
-    (*pp_x) -> value[(*pp_x)->n] = val;
-    sort( (*pp_x)->key, (*pp_x)->n );
-    (*pp_x) -> n++;
+    return;    
 }
 
-int Index::split_child(Node *x, int i)// x 為基準，分裂出 npFirst 作為上方節點，下面接 x 和 npMiddle
-{
-    cout << "split from node " << x << endl;
-    int j, mid_k, mid_v;
-    Node *npFirst, *npMiddle, *y;
-    npMiddle = init();
-    npMiddle -> isLeaf = true;
-    float temp_float = MAX_DEGREE - 2;
-    int temp_int = floor(temp_float/2);//待檢查
-    cout << temp_int << endl;
-    if (i == -1)
-    {
-        mid_k = x -> key[temp_int];//暫存 x 中位數的 key
-        mid_v = x -> value[temp_int];//暫存 x 中位數的 value
-        x -> key[temp_int] = 0;
-        x -> value[temp_int] = 0;
-        x -> n--;
-        npFirst = init();
-        npFirst -> isLeaf = false;//上方的節點
-        x -> isLeaf = true;
-        for (j = temp_int + 1; j < MAX_DEGREE - 1; j++)//右半邊的元素搬到 npMiddle
-        {
-            npMiddle -> key[j - temp_int - 1] = x -> key[j];//繼承 key
-            npMiddle -> value[j - temp_int - 1] = x -> value[j];//繼承 value
-            npMiddle -> child_ptr[j - temp_int - 1] = x -> child_ptr[j];//繼承右半邊的 child_ptr
-            (npMiddle -> n)++;
-            x -> key[j] = 0;//清空
-            x -> value[j] = 0;//清空
-            (x -> n)--;
-        }
-        for (j = 0; j < MAX_DEGREE - 1; j++)//清空 child_ptr，應該是到 MAX_DEGREE 為止，因為 child_ptr 數量較多
-        {
-            x -> child_ptr[j] = NULL;
-        }
-        npFirst -> key[0] = mid_k;
-        npFirst -> value[0] = mid_v;//非子葉應該是不需要給 value
-        npFirst -> child_ptr[npFirst -> n] = x;
-        npFirst -> child_ptr[ (npFirst -> n) + 1] = npMiddle;
-        (npFirst -> n) ++;
-        *pp_root = npFirst;
-    }
-    else
-    {
-        y = x -> child_ptr[i];
-        mid_k = y -> key[temp_int];
-        mid_v = y -> value[temp_int];
-        y -> key[temp_int] = 0;
-        (y -> n)--;
-        for (j = temp_int + 1; j < MAX_DEGREE - 1; j++)
-        {
-            npMiddle -> key [j - temp_int - 1] = y -> key[j];
-            npMiddle -> value [j - temp_int - 1] = y -> value[i];
-            (npMiddle -> n)++;
-        }
-        x -> child_ptr[i + 1] = y;
-        x -> child_ptr[i + 1] = npMiddle;
-    }
-    (*pp_x) -> value[(*pp_x)->n] = mid_v;
-    return mid_k;
-}
-void Index:: sort(int *p, int n)
-{//sort the tree
-   int i, j, t_k, t_v;
-   for (i = 0; i < n; i++) {
-      for (j = i; j <= n; j++) {
-         if (p[i] >p[j]) {
-            t_k = p[i];
-            t_v = ((*pp_x) -> value)[i];
-            p[i] = p[j];
-            ((*pp_x) -> value)[i] =  ((*pp_x) -> value)[j];
-            p[j] = t_k;
-             ((*pp_x) -> value)[j] = t_v;
-         }
-      }
-   }
-}
-
-void Index::traverse(Node *p)
-{
-   cout << endl;
-   int i;
-   for (i = 0; i < p->n; i++) {
-      if (p->isLeaf == false) {
-         traverse(p->child_ptr[i]);
-      }
-      cout << " " << p->key[i];
-   }
-   if (p->isLeaf == false) {
-      traverse(p->child_ptr[i]);
-   }
-   cout<<endl;
-}
-void Index::debug()
-{
-    this->traverse(*(this->pp_root));
-}
 Index::~Index()
 {
 
