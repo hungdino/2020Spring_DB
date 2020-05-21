@@ -63,7 +63,7 @@ void Index::insert(int k, int val)
         {
             temp = split_child( (*pp_x), -1);
             *pp_x = *pp_root;
-            for (i = 0; i < ( (*pp_x) -> n ); ; i++)
+            for (i = 0; i < ( (*pp_x) -> n ); i++)
             {
                 if ( (k > (*pp_x) -> key[i]) && (k < (*pp_x) -> key[i+1]) ){
                     i++;
@@ -110,6 +110,7 @@ void Index::insert(int k, int val)
 
 int Index::split_child(Node *x, int i)// x 為基準，分裂出 npFirst 作為上方節點，下面接 x 和 npMiddle
 {
+    cout << "split from node " << x << endl;
     int j, mid_k, mid_v;
     Node *npFirst, *npMiddle, *y;
     npMiddle = init();
@@ -167,7 +168,42 @@ int Index::split_child(Node *x, int i)// x 為基準，分裂出 npFirst 作為�
     (*pp_x) -> value[(*pp_x)->n] = mid_v;
     return mid_k;
 }
+void Index:: sort(int *p, int n)
+{//sort the tree
+   int i, j, t_k, t_v;
+   for (i = 0; i < n; i++) {
+      for (j = i; j <= n; j++) {
+         if (p[i] >p[j]) {
+            t_k = p[i];
+            t_v = ((*pp_x) -> value)[i];
+            p[i] = p[j];
+            ((*pp_x) -> value)[i] =  ((*pp_x) -> value)[j];
+            p[j] = t_k;
+             ((*pp_x) -> value)[j] = t_v;
+         }
+      }
+   }
+}
 
+void Index::traverse(Node *p)
+{
+   cout << endl;
+   int i;
+   for (i = 0; i < p->n; i++) {
+      if (p->isLeaf == false) {
+         traverse(p->child_ptr[i]);
+      }
+      cout << " " << p->key[i];
+   }
+   if (p->isLeaf == false) {
+      traverse(p->child_ptr[i]);
+   }
+   cout<<endl;
+}
+void Index::debug()
+{
+    this->traverse(*(this->pp_root));
+}
 Index::~Index()
 {
 

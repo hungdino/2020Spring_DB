@@ -30,6 +30,8 @@ public:
     void key_query(vector<int>& query_keys);
     void range_query(vector< pair<int,int> >& query_pairs);
     void clear_index();
+    void sort(int *p, int n);
+    void traverse(Node *p);
     
     Index(int num, vector<int> &key, vector<int> &value);
     ~Index();
