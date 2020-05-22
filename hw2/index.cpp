@@ -12,12 +12,17 @@ Index::Index(int num, vector<int> &key, vector<int> &value)
         insert(key[i], value[i]);
     }
 }
-/*
-Index::Node* init()
+
+Node* Index::init()
 {
-    Node * 
+    Node * np;
+    np = new(Node);
+    np -> isLeaf = true;
+    np -> right = NULL;
+    np -> left = NULL;
+    np -> parent = NULL;
+    return np;
 }
-*/
 
 void Index::insert(int & k, int & val)
 {
@@ -28,10 +33,7 @@ void Index::insert(int & k, int & val)
     */
     if (root == NULL)//整個 B+ Tree 還是空的
     {
-        root = new(Node);
-        root -> isLeaf = 1;
-        root -> right = NULL;
-        root -> left = NULL;
+        root = init();
         root -> key_value_pair.push_back({k, val});
     }
     Node *ptr = root;
@@ -42,8 +44,10 @@ void Index::insert(int & k, int & val)
         if(ptr->isLeaf == true)
         {
             if(ptr->key_value_pair[i-1].first == k){
-                cout << "The inserted key is used." << endl;
-                return;
+                cout << "The inserted key " << k << " is used." << endl;
+                cout << "with the value   " << val << " is used." << endl;
+                cout << "The existed key  " << ptr->key_value_pair[i-1].first << " is used." << endl;
+                cout << "with the value   " << ptr->key_value_pair[i-1].second << " is used." << endl;                return;
             }
             else
             {
@@ -69,9 +73,9 @@ void Index::insert(int & k, int & val)
 
 void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上方節點，下面接 x 和 npMiddle
 {
-    cout << "split from node " << ptr << endl;
-    Node * node_left = new(Node);
-    Node * node_right = new(Node);
+    //cout << "split from node " << ptr << endl;
+    Node * node_left = init();
+    Node * node_right = init();
 
     node_left -> isLeaf = ptr -> isLeaf;
     node_right -> isLeaf = ptr -> isLeaf;
@@ -90,7 +94,7 @@ void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上�
     if (ptr == root)
     {
         height ++;
-        root = new(Node);
+        root = init();
         node_right -> parent = node_left -> parent = root;
         root -> parent = NULL;
         root -> left = root -> right = NULL;
@@ -164,8 +168,7 @@ void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上�
             p->ptr_v.insert(p->ptr_v.begin()+i+1, node_right);
         }
         delete(ptr);
-        if (p->key_value_pair.size() > 2*ORDER)
-        {
+        if (p->key_value_pair.size() > 2*ORDER){
             split_child(p);
         }
     }
@@ -196,7 +199,8 @@ void Index::key_query(vector<int> &keys)
             file << "-1" << endl;
             continue;
         }
-        for (int i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++)
+        int i;
+        for (i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++)
         {
             if (k == ptr->key_value_pair[i].first)
             {
