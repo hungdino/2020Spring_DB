@@ -176,3 +176,63 @@ int main() {
    cout<<"traversal of constructed B tree\n";
    traverse(r);
 }
+
+
+void Index ::key_query(vector<int> key){
+    
+    ofstream file;
+    file.open("key_query_out.txt",std::ios_base::app);
+    for(int k=0;k<key.size();k++){
+        node * pt = root;
+        int KEY=key[k];
+        //cout<<"now query "<<KEY<<endl;
+        while(pt->isleaf==0){
+            int i=0;
+            //cout<<"到底在哪";
+            //cout<<KEY<<endl;
+            //cout<<pt->key_val_v[pt->key_val_v.size()-1].first<<endl;
+            if(KEY<pt->key_val_v[0].first){
+                i=0;
+            }else if(KEY>=pt->key_val_v[pt->key_val_v.size()-1].first){
+                i=pt->key_val_v.size();
+            }else{
+                i=0;
+                for(i=0;i<pt->key_val_v.size() && KEY >= pt->key_val_v[i].first;i++);
+            
+                /*int l=0,r=pt->key_val_v.size();
+                int m;
+                for(m=(l+r)/2;!(key >= pt->key_val_v[m-1].first && key<pt->key_val_v[m].first) ;){
+                    if(key > pt->key_val_v[m].first)l=m;
+                    else if(key < pt->key_val_v[m].first)r=m;
+                    else if(key == pt->key_val_v[m].first)break;
+                    m=(l+r)/2;
+                }
+                i    = m;*/
+            }     
+            pt = pt->pt_v[i];
+        }
+        /*for(int i=0;i<pt->key_val_v.size();i++){
+            cout<<pt->key_val_v[i].first<<" ";
+        }*/
+        if(KEY<pt->key_val_v[0].first || KEY>pt->key_val_v[pt->key_val_v.size()-1].first){
+            file <<"-1\n";continue;
+        }
+        int i=0;
+        for(i=0;i<pt->key_val_v.size() && KEY>=pt->key_val_v[i].first;i++){
+            if(KEY==pt->key_val_v[i].first){file<<pt->key_val_v[i].second<<endl;goto end;}
+        }
+        file<<"-1\n";continue;
+        /*for(int m=(l+r)/2;pt->key_val_v[m].first!=key;){
+            if(key>pt->key_val_v[m].first)l=m;
+            else if(key<pt->key_val_v[m].first)r=m;
+            else if(key==pt->key_val_v[m].first){
+                file << pt->key_val_v[m].second<< endl;
+            }
+            if(r==l+1){
+                file<<"-1\n"<<endl;return;
+            }
+        }*/
+        end:;
+    }
+    file.close();
+}

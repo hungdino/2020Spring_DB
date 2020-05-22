@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <typeinfo>
 #include <math.h>
+#include <fstream>
 #include "index.h"
 
 
@@ -11,10 +12,18 @@ Index::Index(int num, vector<int> &key, vector<int> &value)
         insert(key[i], value[i]);
     }
 }
+/*
+Index::Node* init()
+{
+    Node * 
+}
+*/
+
 void Index::insert(int & k, int & val)
 {
     cout << "insert key: " << setw(3) << k << endl;
     cout << "with value: " << setw(3) << val << endl;
+    cout << endl;
     if (root == NULL)//整個 B+ Tree 還是空的
     {
         root = new(Node);
@@ -37,9 +46,9 @@ void Index::insert(int & k, int & val)
             else
             {
                 if (i == ptr -> key_value_pair.size()){
-                    ptr -> key_value_pair.push_back({key, value});
+                    ptr -> key_value_pair.push_back({k, val});
                 }else{
-                    ptr -> key_value_pair.insert(ptr->key_value_pair.begin() + i, {key, value});
+                    ptr -> key_value_pair.insert(ptr->key_value_pair.begin() + i, {k, val});
                 }
                 if (ptr -> key_value_pair.size() > 2*ORDER)
                 {
@@ -55,7 +64,7 @@ void Index::insert(int & k, int & val)
     }
 }
 
-int Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上方節點，下面接 x 和 npMiddle
+void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上方節點，下面接 x 和 npMiddle
 {
     cout << "split from node " << ptr << endl;
     Node * node_left = new(Node);
@@ -129,7 +138,7 @@ int Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上方
                 node_left -> ptr_v.push_back(ptr -> ptr_v[i]);
                 node_right -> ptr_v.push_back(ptr -> ptr_v[ORDER+1+i]);
             }
-            for ( i = 0; i < ORDER_1; i++)
+            for ( i = 0; i < ORDER+1; i++)
             {
                 node_left -> ptr_v[i] -> parent = node_left;
                 node_right -> ptr_v[i] -> parent = node_right;
@@ -151,7 +160,7 @@ int Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上方
             p->ptr_v[i] = node_left;
             p->ptr_v.insert(p->ptr_v.begin()+i+1, node_right);
         }
-        delete(pt);
+        delete(ptr);
         if (p->key_value_pair.size() > 2*ORDER)
         {
             split_child(p);
@@ -159,8 +168,114 @@ int Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上方
     }
     return;    
 }
-
-Index::~Index()
+void Index::key_query(vector<int> &keys)
 {
-
+    ofstream file;
+    file.open("key_query_out.txt", ios::out | ios::app);
+    for (int j = 0; j < keys.size(); j++)
+    {
+        Node * ptr = root;
+        int k = keys[j];
+        while (ptr->isLeaf == false)
+        {
+            int i = 0;
+            if (k < ptr->key_value_pair[0].first){
+                i = 0;
+            }else if (k >= ptr->key_value_pair[ptr->key_value_pair.size()-1].first){
+                i = ptr->key_value_pair.size();
+            }else{
+                for ( i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++);
+            }
+        ptr = ptr -> ptr_v[i];
+       }
+        if (k < ptr -> key_value_pair[0].first || k > ptr-> key_value_pair[ptr->key_value_pair.size()-1].first)
+        {//Not found
+            file << "-1" << endl;
+            continue;
+        }
+        for (int i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++)
+        {
+            if (k == ptr->key_value_pair[i].first)
+            {
+                file << ptr->key_value_pair[i].second << endl;
+                goto end;
+            }
+        }
+        file << "-1" << endl;
+        continue;
+        end:;
+    }
+    file.close();
+}
+void Index::range_query(vector< pair<int,int> > &key_pair_v)
+{
+    ofstream file;
+    file.open("range_query_out.txt", ios::out | ios::app);
+    for (int j = 0; j < key_pair_v.size(); j++)
+    {
+        int k1 = key_pair_v[j].first;
+        int k2 = key_pair_v[j].second;
+        Node * ptr = root;
+        int i;
+        while (ptr-> isLeaf == false)
+        {
+            for ( i = 0; i < ptr->key_value_pair.size() && k1 >= ptr->key_value_pair[i].first; i++);
+            ptr = ptr -> ptr_v[i];
+        }
+        for ( i = 0; i < ptr -> key_value_pair.size() && k1 > ptr->key_value_pair[i].first; i++);
+        if (i == ptr->key_value_pair.size() && ptr->right != NULL)
+        {
+            i = 0;
+            ptr = ptr->right;
+        }
+        if(i==ptr->key_value_pair.size() && ptr->right==NULL){
+            cout << "key range not found" << endl;
+        }
+        int max = -1000000000;
+        while (ptr->key_value_pair[i].first <= k2)
+        {
+            if (max < ptr->key_value_pair[i].second){
+                max = ptr -> key_value_pair[i].second;
+            }
+            i++;
+            if (i >= ptr->key_value_pair.size())
+            {
+                if (ptr -> right != NULL)
+                {
+                    ptr = ptr -> right;
+                    i = 0;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        if (max == -1000000000)
+        {
+            file << "No value found" << endl;
+        }
+        else{
+            file << max << endl;
+        }
+    }
+    file.close();
+}
+void Index::clear_index()
+{
+    release(root);
+}
+void Index::release(Node *ptr)
+{
+    if (ptr -> isLeaf == true)
+    {
+        delete(ptr);
+        return;
+    }else{
+        for (int i = 0; i < ptr->ptr_v.size(); i++)
+        {
+            release(ptr->ptr_v[i]);
+        }
+    }
+    delete ptr;
 }

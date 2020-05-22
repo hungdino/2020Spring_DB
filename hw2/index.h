@@ -12,7 +12,7 @@ struct Node
     Node *parent;
     Node *right;
     Node *left;
-    vector<node *> ptr_v;
+    vector<Node *> ptr_v;
     vector< pair<int,int> > key_value_pair;
     bool isLeaf;
 };
@@ -33,7 +33,6 @@ public:
     void sort(int *p, int n);
     
     Index(int num, vector<int> &key, vector<int> &value);
-    ~Index();
     void release(Node *ptr);
     void debug();
 };
