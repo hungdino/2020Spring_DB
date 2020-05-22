@@ -47,7 +47,8 @@ void Index::insert(int & k, int & val)
                 cout << "The inserted key " << k << " is used." << endl;
                 cout << "with the value   " << val << " is used." << endl;
                 cout << "The existed key  " << ptr->key_value_pair[i-1].first << " is used." << endl;
-                cout << "with the value   " << ptr->key_value_pair[i-1].second << " is used." << endl;                return;
+                cout << "with the value   " << ptr->key_value_pair[i-1].second << " is used." << endl;                
+                return;
             }
             else
             {
@@ -87,8 +88,7 @@ void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上�
     if (ptr -> right != NULL){
         ptr -> right -> left = node_right;
     }
-    if (ptr -> left != NULL)
-    {
+    if (ptr -> left != NULL){
         ptr -> left -> right = node_left;
     }
     if (ptr == root)
@@ -96,8 +96,6 @@ void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上�
         height ++;
         root = init();
         node_right -> parent = node_left -> parent = root;
-        root -> parent = NULL;
-        root -> left = root -> right = NULL;
         root -> isLeaf = false;
         root -> key_value_pair.push_back(ptr->key_value_pair[ORDER]);
         if (ptr -> isLeaf == true)
@@ -128,7 +126,7 @@ void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上�
     }else{
         pair<int,int> mid = ptr -> key_value_pair[ORDER];
         Node *p = ptr -> parent;
-        node_left -> parent = node_right -> parent = ptr -> parent;
+        node_left -> parent = node_right -> parent = p;
         int i;
         if (ptr -> isLeaf == true)
         {
@@ -252,9 +250,7 @@ void Index::range_query(vector< pair<int,int> > &key_pair_v)
                     ptr = ptr -> right;
                     i = 0;
                 }
-                else
-                {
-                    break;
+                else{break;
                 }
             }
         }
