@@ -21,9 +21,11 @@ Index::Node* init()
 
 void Index::insert(int & k, int & val)
 {
+    /*
     cout << "insert key: " << setw(3) << k << endl;
     cout << "with value: " << setw(3) << val << endl;
     cout << endl;
+    */
     if (root == NULL)//整個 B+ Tree 還是空的
     {
         root = new(Node);
@@ -33,9 +35,9 @@ void Index::insert(int & k, int & val)
         root -> key_value_pair.push_back({k, val});
     }
     Node *ptr = root;
-    int i = 0;
     while (true)
     {
+        int i = 0;
         for ( i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++);
         if(ptr->isLeaf == true)
         {
@@ -53,6 +55,7 @@ void Index::insert(int & k, int & val)
                 if (ptr -> key_value_pair.size() > 2*ORDER)
                 {
                     split_child(ptr);
+                    return;
                 }
                 return;
                 
@@ -125,7 +128,7 @@ void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上�
         int i;
         if (ptr -> isLeaf == true)
         {
-            node_right -> key_value_pair.push_back( ptr -> key_value_pair[i]);
+            node_right -> key_value_pair.push_back( ptr -> key_value_pair[ORDER]);
         }
         for ( i = 0; i < ORDER; i++)
         {
