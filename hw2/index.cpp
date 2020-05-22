@@ -40,7 +40,7 @@ void Index::insert(int & k, int & val)
     while (true)
     {
         int i = 0;
-        for ( i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++);
+        for ( i = 0; i < ptr->key_value_pair.size() && k > ptr->key_value_pair[i].first; i++);
         if(ptr->isLeaf == true)
         {
             if(ptr->key_value_pair[i-1].first == k){
@@ -130,7 +130,7 @@ void Index::split_child(Node *ptr)// x 為基準，分裂出 npFirst 作為上�
         int i;
         if (ptr -> isLeaf == true)
         {
-            node_right -> key_value_pair.push_back( ptr -> key_value_pair[ORDER]);
+            node_right -> key_value_pair.push_back( ptr -> key_value_pair[ORDER]);// assign 中間值
         }
         for ( i = 0; i < ORDER; i++)
         {
@@ -188,16 +188,17 @@ void Index::key_query(vector<int> &keys)
             }else if (k >= ptr->key_value_pair[ptr->key_value_pair.size()-1].first){
                 i = ptr->key_value_pair.size();
             }else{
+                i = 0;
                 for ( i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++);
             }
-        ptr = ptr -> ptr_v[i];
+            ptr = ptr -> ptr_v[i];
        }
         if (k < ptr -> key_value_pair[0].first || k > ptr-> key_value_pair[ptr->key_value_pair.size()-1].first)
         {//Not found
             file << "-1" << endl;
             continue;
         }
-        int i;
+        int i = 0;
         for (i = 0; i < ptr->key_value_pair.size() && k >= ptr->key_value_pair[i].first; i++)
         {
             if (k == ptr->key_value_pair[i].first)
@@ -275,8 +276,7 @@ void Index::release(Node *ptr)
         delete(ptr);
         return;
     }else{
-        for (int i = 0; i < ptr->ptr_v.size(); i++)
-        {
+        for (int i = 0; i < ptr->ptr_v.size(); i++){
             release(ptr->ptr_v[i]);
         }
     }
