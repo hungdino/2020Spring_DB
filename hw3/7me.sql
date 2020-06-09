@@ -1,4 +1,4 @@
-EXPLAIN SELECT pos position, champion_name, kda
+ANALYZE SELECT pos position, champion_name, kda
 FROM
 	(SELECT A.pos pos, A.c_i c_i, A.kda kda
 	FROM
