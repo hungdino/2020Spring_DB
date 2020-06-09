@@ -1,4 +1,4 @@
-ANALYZE SELECT pos position, champion_name, kda
+CREATE SELECT pos position, champion_name, kda
 FROM
 	(SELECT A.pos pos, A.c_i c_i, A.kda kda
 	FROM
@@ -20,6 +20,7 @@ FROM
 	ON (A.pos = B.pos AND A.kda < B.kda)
 	WHERE B.kda is NULL
 	) AS RESULT JOIN champ ON (RESULT.c_i = champ.champion_id)
-ORDER BY position ASC;
+ORDER BY position ASC
+AS me;
 
 
