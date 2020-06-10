@@ -1,6 +1,6 @@
 -- 列出五個位置 (TOP/MID/JUNGLE/DUO_CARRY/DUO_SUPPORT) 中，且總擊殺參與率 (總KDA = (總Kill + 總Assist) / 總Death) 最高的英雄與對應的總KDA值（提示：group by, sum）
  
-CREATE select grp.position, grp.champion_name, tmp.kda
+CREATE TABLE ta7sql select grp.position, grp.champion_name, tmp.kda
 from
 (
     select par_champ.position, par_champ.champion_name, 
@@ -52,5 +52,4 @@ from
 ) as tmp
 where tmp.kda = grp.sum_kda
 and tmp.position = grp.position
-order by grp.position
-AS ta;
+order by grp.position;
